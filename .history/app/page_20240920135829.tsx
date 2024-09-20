@@ -12,10 +12,6 @@ interface Ball {
 interface BallDetectionParams {
   min_radius: number;
   max_radius: number;
-  dp: number;
-  minDist: number;
-  param1: number;
-  param2: number;
 }
 
 export default function Home() {
@@ -25,11 +21,7 @@ export default function Home() {
   const [servoAngle, setServoAngle] = useState(90);
   const [ballParams, setBallParams] = useState<BallDetectionParams>({
     min_radius: 15,
-    max_radius: 30,
-    dp: 1.2,
-    minDist: 50,
-    param1: 100,
-    param2: 30
+    max_radius: 30
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -136,43 +128,6 @@ export default function Home() {
                 type="number"
                 value={ballParams.max_radius}
                 onChange={(e) => setBallParams({...ballParams, max_radius: parseInt(e.target.value)})}
-                className="ml-2 p-1 border rounded"
-              />
-            </label>
-            <label>
-              DP:
-              <input
-                type="number"
-                step="0.1"
-                value={ballParams.dp}
-                onChange={(e) => setBallParams({...ballParams, dp: parseFloat(e.target.value)})}
-                className="ml-2 p-1 border rounded"
-              />
-            </label>
-            <label>
-              Min Distance:
-              <input
-                type="number"
-                value={ballParams.minDist}
-                onChange={(e) => setBallParams({...ballParams, minDist: parseInt(e.target.value)})}
-                className="ml-2 p-1 border rounded"
-              />
-            </label>
-            <label>
-              Param1:
-              <input
-                type="number"
-                value={ballParams.param1}
-                onChange={(e) => setBallParams({...ballParams, param1: parseInt(e.target.value)})}
-                className="ml-2 p-1 border rounded"
-              />
-            </label>
-            <label>
-              Param2:
-              <input
-                type="number"
-                value={ballParams.param2}
-                onChange={(e) => setBallParams({...ballParams, param2: parseInt(e.target.value)})}
                 className="ml-2 p-1 border rounded"
               />
             </label>

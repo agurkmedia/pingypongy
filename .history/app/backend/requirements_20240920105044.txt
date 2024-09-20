@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+opencv-python
+numpy
+RPi.GPIO
+pydantic
+python-multipart

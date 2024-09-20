@@ -1,21 +1,17 @@
 'use client'
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { trackBalls, controlServo, updateBallParams } from './services/api';
 
 interface Ball {
   x: number;
   y: number;
   color: string;
-  radius: number;
 }
 
 interface BallDetectionParams {
+  min_area: number;
   min_radius: number;
   max_radius: number;
-  dp: number;
-  minDist: number;
-  param1: number;
-  param2: number;
 }
 
 export default function Home() {
@@ -24,14 +20,10 @@ export default function Home() {
   const [frame, setFrame] = useState('');
   const [servoAngle, setServoAngle] = useState(90);
   const [ballParams, setBallParams] = useState<BallDetectionParams>({
-    min_radius: 15,
-    max_radius: 30,
-    dp: 1.2,
-    minDist: 50,
-    param1: 100,
-    param2: 30
+    min_area: 100,
+    min_radius: 10,
+    max_radius: 50
   });
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -43,28 +35,10 @@ export default function Home() {
       } catch (error) {
         console.error('Failed to track balls:', error);
       }
-    }, 100); // Update 10 times per second
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    if (frame && canvasRef.current) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        const img = new Image();
-        img.onload = () => {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-          
-          // The backend now draws the circles and labels, so we don't need to do it here
-        };
-        img.src = `data:image/jpeg;base64,${frame}`;
-      }
-    }
-  }, [frame]);
 
   const handleServoControl = async () => {
     try {
@@ -88,7 +62,9 @@ export default function Home() {
         <h1 className="text-3xl font-bold">Pingpong Ball Feeder System</h1>
         <div className="bg-gray-100 p-4 rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Camera Feed</h2>
-          <canvas ref={canvasRef} className="w-full max-w-lg" />
+          {frame && (
+            <img src={`data:image/jpeg;base64,${frame}`} alt="Camera Feed" className="w-full max-w-lg" />
+          )}
         </div>
         <div className="bg-gray-100 p-4 rounded-lg">
           <h2 className="text-xl font-semibold mb-2">Detected Balls</h2>
@@ -96,7 +72,7 @@ export default function Home() {
           <ul>
             {balls.map((ball, index) => (
               <li key={index}>
-                Ball at x: {ball.x}, y: {ball.y}, color: {ball.color}, radius: {ball.radius}
+                Ball at x: {ball.x}, y: {ball.y}, color: {ball.color}
               </li>
             ))}
           </ul>
@@ -122,6 +98,15 @@ export default function Home() {
           <h2 className="text-xl font-semibold">Ball Detection Parameters</h2>
           <div className="flex flex-col gap-2">
             <label>
+              Min Area:
+              <input
+                type="number"
+                value={ballParams.min_area}
+                onChange={(e) => setBallParams({...ballParams, min_area: parseInt(e.target.value)})}
+                className="ml-2 p-1 border rounded"
+              />
+            </label>
+            <label>
               Min Radius:
               <input
                 type="number"
@@ -136,43 +121,6 @@ export default function Home() {
                 type="number"
                 value={ballParams.max_radius}
                 onChange={(e) => setBallParams({...ballParams, max_radius: parseInt(e.target.value)})}
-                className="ml-2 p-1 border rounded"
-              />
-            </label>
-            <label>
-              DP:
-              <input
-                type="number"
-                step="0.1"
-                value={ballParams.dp}
-                onChange={(e) => setBallParams({...ballParams, dp: parseFloat(e.target.value)})}
-                className="ml-2 p-1 border rounded"
-              />
-            </label>
-            <label>
-              Min Distance:
-              <input
-                type="number"
-                value={ballParams.minDist}
-                onChange={(e) => setBallParams({...ballParams, minDist: parseInt(e.target.value)})}
-                className="ml-2 p-1 border rounded"
-              />
-            </label>
-            <label>
-              Param1:
-              <input
-                type="number"
-                value={ballParams.param1}
-                onChange={(e) => setBallParams({...ballParams, param1: parseInt(e.target.value)})}
-                className="ml-2 p-1 border rounded"
-              />
-            </label>
-            <label>
-              Param2:
-              <input
-                type="number"
-                value={ballParams.param2}
-                onChange={(e) => setBallParams({...ballParams, param2: parseInt(e.target.value)})}
                 className="ml-2 p-1 border rounded"
               />
             </label>
